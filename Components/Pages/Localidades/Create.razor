@@ -1,0 +1,63 @@
+﻿@page "/localidades/create"
+@using IBGE_Blazor.Models
+@using IBGE_Blazor.Data
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext Context;
+@inject NavigationManager NavManager
+
+
+<h3>NOVA LOCALIDADE</h3>
+
+<EditForm Model="@model" OnValidSubmit="@CreateLocal" method="post" FormName="CriarLocalidade">
+@*     <DataAnnotationsValidator />
+    <ValidationSummary /> *@
+    <div class="mb-3">
+        <label for="Id" class="form-label">Codigo</label>
+        <InputText class="form-control" type="text" id="Id" @bind-Value="model.Id" />
+    </div>
+
+    <div class="mb-3">
+        <label for="Cidade" class="form-label">Cidade</label>
+        <InputText class="form-control" type="text" id="Cidade" @bind-Value="model.City" />
+    </div>
+
+    <div class="mb-3">
+        <label for="Estado" class="form-label">Estado</label>
+        <InputText class="form-control" type="text" id="Estado" @bind-Value="model.State" />
+    </div>
+
+  @*   @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @errorMessage
+        </div>
+    } *@
+
+    <button class="btn btn-success" type="submit">SALVAR</button>
+</EditForm>
+
+
+@code {
+    private Localidade model = new Localidade();
+    private List<Localidade> localidades = new();
+    private string? errorMessage = null;
+
+    private async Task CreateLocal()
+    {
+        try
+        {
+            //VALIDAR SE CIDADE NAO EXISTE
+            //AJUSTAR POST
+            await Context.Cidades.AddAsync(model);
+            await Context.SaveChangesAsync();
+            NavManager.NavigateTo("/localidades");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+
+
+}

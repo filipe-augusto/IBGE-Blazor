@@ -1,0 +1,72 @@
+﻿@page "/localidades/edit/{id}"
+@using IBGE_Blazor.Models
+@using IBGE_Blazor.Data
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext Context;
+@inject NavigationManager NavManager
+
+<h1>@model?.City</h1>
+
+<EditForm Model="@model" OnValidSubmit="@HandleSubmit" @formname="EditLocal">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="mb-3">
+        <label for="Cidade" class="form-label">Cidade</label>
+        <InputText class="form-control" type="text" id="Cidade" @bind-Value="model.City" />
+    </div>
+
+    <div class="mb-3">
+        <label for="Estado" class="form-label">Estado</label>
+        <InputText class="form-control" type="text" id="Estado" @bind-Value="model.State" />
+    </div>
+
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">
+            @errorMessage
+        </div>
+    }
+
+    <button class="btn btn-success" type="submit">SALVAR</button>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; }
+
+    private Localidade? model = new();
+    private List<Localidade> categories = new();
+    private string? errorMessage = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        model = await Context.Cidades.AsNoTracking().FirstOrDefaultAsync(x => x.Id == Id);
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            var cidade = await Context.Cidades.FirstOrDefaultAsync(x => x.Id == Id);
+            if (cidade is null)
+                throw new Exception("Cidade não encontrado");
+
+            cidade.City = model.City;
+            cidade.State = model.State;
+        
+
+            Context.Cidades.Update(cidade);
+            await Context.SaveChangesAsync();
+
+            NavManager.NavigateTo("/localidades");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
+
+}

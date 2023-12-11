@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "sqlite1": {
+      "type": "sqlite",
+      "connectionId": "DataSource=Data::app.db;Cache=Shared",
+      "dynamicId": null
+    }
+  }
+}

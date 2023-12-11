@@ -1,0 +1,49 @@
+﻿@page "/localidades"
+@using IBGE_Blazor.Data
+@using IBGE_Blazor.Models
+@using Microsoft.EntityFrameworkCore
+@using System.Globalization
+@inject ApplicationDbContext Context;
+
+<h1>Localidades</h1>
+<a href="localidades/create" class="btn btn-primary"><i class="oi oi-plus"></i> CREATE </a>
+<table class="table">
+    <thead>
+        <tr>
+            <td>Codigo</td>
+            <td>Cidade</td>
+            <td>Estado</td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var localidade in _localidades)
+        {
+            <tr>
+                <td>@localidade.Id</td>
+                <td>@localidade.City</td>
+                <td>@localidade.State</td>
+                 <td>
+
+                    <a href="/localidades/edit/@localidade.Id">EDIT</a>
+                    <a href="/localidades/delete/@localidade.Id">DELETE</a>
+                </td> 
+            </tr>
+        }
+
+        </tbody>
+        </table>
+
+@code {
+    private List<Localidade> _localidades = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+
+        //PAGINAÇÃO ...
+
+        //COMPONENTES
+        _localidades = await Context.Cidades.AsNoTracking().ToListAsync();
+    }
+}
