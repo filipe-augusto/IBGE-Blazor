@@ -56,7 +56,7 @@ namespace IBGEBlazor.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(7)", maxLength: 7, nullable: false),
                     State = table.Column<string>(type: "nvarchar(2)", maxLength: 2, nullable: false),
-                    City = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: false)
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IBGEBlazor.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231211125459_Inicial")]
+    [Migration("20231214144650_Inicial")]
     partial class Inicial
     {
         /// <inheritdoc />
@@ -98,8 +98,7 @@ namespace IBGEBlazor.Migrations
 
                     b.Property<string>("City")
                         .IsRequired()
-                        .HasMaxLength(80)
-                        .HasColumnType("nvarchar(80)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("State")
                         .IsRequired()
