@@ -4,20 +4,21 @@
 @using Microsoft.EntityFrameworkCore
 @inject ApplicationDbContext Context;
 @inject NavigationManager NavManager
+@rendermode InteractiveServer
 
-<h1>@model?.City</h1>
+<h1>@Model?.City</h1>
 
-<EditForm Model="@model" OnValidSubmit="@HandleSubmit" @formname="EditLocal">
+    <EditForm Model="@Model" OnValidSubmit="@EditarLocal" FormName="editar-localidade-form">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="mb-3">
         <label for="Cidade" class="form-label">Cidade</label>
-        <InputText class="form-control" type="text" id="Cidade" @bind-Value="model.City" />
+        <InputText class="form-control" type="text" id="Cidade" @bind-Value="Model.City" />
     </div>
 
     <div class="mb-3">
         <label for="Estado" class="form-label">Estado</label>
-        <InputText class="form-control" type="text" id="Estado" @bind-Value="model.State" />
+        <InputText class="form-control" type="text" id="Estado" @bind-Value="Model.State" />
     </div>
 
 
@@ -33,20 +34,20 @@
 
 @code {
 
+    [SupplyParameterFromForm]
+    private Localidade? Model { get; set; } = new();
     [Parameter]
     public string Id { get; set; }
-
-    private Localidade? model = new();
     private List<Localidade> categories = new();
     private string? errorMessage = null;
 
     protected override async Task OnInitializedAsync()
     {
 
-        model = await Context.Cidades.AsNoTracking().FirstOrDefaultAsync(x => x.Id == Id);
+        Model = await Context.Cidades.AsNoTracking().FirstOrDefaultAsync(x => x.Id == Id);
     }
 
-    private async Task HandleSubmit()
+    private async Task EditarLocal()
     {
         try
         {
@@ -54,13 +55,18 @@
             if (cidade is null)
                 throw new Exception("Cidade não encontrado");
 
-            cidade.City = model.City;
-            cidade.State = model.State;
+            cidade.City = Model.City;
+            cidade.State = Model.State;
         
 
             Context.Cidades.Update(cidade);
             await Context.SaveChangesAsync();
 
+            
+            
+            
+            
+            
             NavManager.NavigateTo("/localidades");
         }
         catch (Exception ex)

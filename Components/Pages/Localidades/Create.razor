@@ -4,43 +4,51 @@
 @using Microsoft.EntityFrameworkCore
 @inject ApplicationDbContext Context;
 @inject NavigationManager NavManager
-
-
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+<Mensagem Texto="@_mensagem" TipoMensagem="@_tipoMensagem" Exibir="_exibir"></Mensagem>
 <h3>NOVA LOCALIDADE</h3>
-
-<EditForm Model="@model" OnValidSubmit="@CreateLocal" method="post" FormName="CriarLocalidade">
-@*     <DataAnnotationsValidator />
-    <ValidationSummary /> *@
+  
+<EditForm Model="@Model" OnValidSubmit="@CreateLocal" FormName="criar-localidade-form">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+@* <form Model="@model" @onsubmit="CreateLocal" method="post" @formname="criar-localidade-form"> *@
+   @*  <AntiforgeryToken /> *@
     <div class="mb-3">
         <label for="Id" class="form-label">Codigo</label>
-        <InputText class="form-control" type="text" id="Id" @bind-Value="model.Id" />
+        <InputText class="form-control" type="text" id="Id" @bind-Value="Model.Id" />
     </div>
 
     <div class="mb-3">
         <label for="Cidade" class="form-label">Cidade</label>
-        <InputText class="form-control" type="text" id="Cidade" @bind-Value="model.City" />
+        <InputText class="form-control" type="text" id="Cidade" @bind-Value="Model.City" />
     </div>
 
     <div class="mb-3">
         <label for="Estado" class="form-label">Estado</label>
-        <InputText class="form-control" type="text" id="Estado" @bind-Value="model.State" />
+        <InputText class="form-control" type="text" id="Estado" @bind-Value="Model.State" />
     </div>
 
-  @*   @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <div class="alert alert-danger" role="alert">
-            @errorMessage
-        </div>
-    } *@
-
     <button class="btn btn-success" type="submit">SALVAR</button>
+@* </form> *@
 </EditForm>
 
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 @code {
-    private Localidade model = new Localidade();
+    [SupplyParameterFromForm]
+    private Localidade? Model { get; set; } = new Localidade();
     private List<Localidade> localidades = new();
     private string? errorMessage = null;
+    string _mensagem = "";
+    string _tipoMensagem = "";
+    string _exibir = "none";
+
+    protected override  void OnInitialized()
+    {
+        //_mensagem = "Teste";
+
+    }
+
 
     private async Task CreateLocal()
     {
@@ -48,16 +56,42 @@
         {
             //VALIDAR SE CIDADE NAO EXISTE
             //AJUSTAR POST
-            await Context.Cidades.AddAsync(model);
+            await Context.Cidades.AddAsync(Model);
             await Context.SaveChangesAsync();
+            // await ChamaMensagem("Localidade criada com sucesso!", "success", 3);
+           // await MostrarMensagem_Sucesso();
+            await Task.Delay(2000);
             NavManager.NavigateTo("/localidades");
         }
         catch (Exception ex)
         {
             errorMessage = ex.Message;
+            await MostrarMensagem_Falha();
         }
     }
 
+ 
 
+    async Task MostrarMensagem_Sucesso()
+    {
+        await JSRuntime
+        .InvokeVoidAsync("MensagemCriacao");
+
+    }
+    async Task MostrarMensagem_Falha()
+    {
+        await JSRuntime
+       .InvokeVoidAsync("MensagemCriacao");
+        StateHasChanged();
+
+    }
+    async Task ChamaMensagem(string mensagem, string tipomensagem, int quantidadeSegundos)
+    {
+        _mensagem = mensagem;
+        _tipoMensagem = tipomensagem;
+        _exibir = "block";
+        await Task.Delay(quantidadeSegundos * 1000);
+        _exibir = "none";
+    }
 
 }

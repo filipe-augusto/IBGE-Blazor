@@ -1,0 +1,48 @@
+﻿
+<style>
+    .alerta {
+        z-index: 9999;
+        position: fixed !important;
+        width: 80%;
+        margin-left: 10px;
+        margin-right: 10px;
+        height: 40px;
+        border: 10px white;
+     
+    }
+</style>
+
+    <div class="row alerta">
+        <div class="col-3">
+
+        </div>
+        <div class="col-6">
+            <div class="alert alert-@TipoMensagem  m-5" role="alert" style="display:@Exibir" >
+                @Texto
+            </div>
+
+        </div>
+        <div class="col-3">
+        </div>
+    </div>
+
+
+
+@code {
+
+    [Parameter]
+    public string TipoMensagem { get; set; } 
+    [Parameter]
+    public string Texto { get; set; } 
+
+    [Parameter]
+    public string Exibir { get; set; } = "none";
+
+    protected override void OnInitialized()
+    {
+        Exibir = "none";
+        TipoMensagem = "primary";
+    }
+    //secondary  success danger warning info
+
+}
