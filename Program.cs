@@ -5,13 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using IBGE_Blazor.Components;
 using IBGE_Blazor.Components.Account;
 using IBGE_Blazor.Data;
+using CurrieTechnologies.Razor.SweetAlert2;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
+builder.Services.AddSweetAlert2();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
@@ -57,6 +58,8 @@ else
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+
 
 app.UseAntiforgery();
 app.MapRazorComponents<App>()

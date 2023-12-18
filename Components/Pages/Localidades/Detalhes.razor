@@ -5,6 +5,8 @@
 @inject ApplicationDbContext Context;
 @inject NavigationManager NavManager
 @rendermode InteractiveServer
+@inject SweetAlertService Swal;
+@inject IJSRuntime JSRuntime
 <div class="row">
 
 
@@ -40,6 +42,7 @@
 
             </div>
             <div class="col-3">
+               @*  <NavigationLock OnBeforeInternalNavigation="OnBeforeInternalNavigation" /> *@
                 <button class="btn btn-danger" @onclick="DeleteLocal"> Excluir</button>
             </div>
             <div class="col-6">
@@ -82,7 +85,7 @@
 
             Context.Cidades.Update(cidade);
             await Context.SaveChangesAsync();
-
+            await JSRuntime.InvokeVoidAsync("alert", "Localidade editada com sucesso!");
             NavManager.NavigateTo("/localidades");
         }
         catch (Exception ex)
@@ -91,23 +94,46 @@
         }
     }
 
+
+
+
+    private async Task OnBeforeInternalNavigation(LocationChangingContext context)
+    {
+
+        var result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "Confirmation",
+                Text = "Você tem certeza que deseja excluir esse registro?",
+                Icon = SweetAlertIcon.Warning,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Sim, desejo cancelar",
+                CancelButtonText = "Não"
+            });
+
+        var confirm = !string.IsNullOrEmpty(result.Value);
+
+        if (!confirm)
+        {
+            context.PreventNavigation();
+        }
+
+    }
+
     private async Task DeleteLocal()
     {
-        try
+
+        var confirm = await JSRuntime.InvokeAsync<bool>("confirm", "Você confirma a exclusão?");
+
+        if (confirm == true)
         {
-
-
-            var local = await Context.Cidades.FirstOrDefaultAsync(x => x.Id == Id);
-            if (local is null)
-                throw new Exception("Produto não encontrado");
-            Context.Cidades.Remove(local);
-            await Context.SaveChangesAsync();
-            NavManager.NavigateTo("/localidades");
-        }
-        catch (Exception)
-        {
-
-            throw;
+            
+        var local = await Context.Cidades.FirstOrDefaultAsync(x => x.Id == Id);
+                if (local is null)
+                    throw new Exception("Produto não encontrado");
+                Context.Cidades.Remove(local);
+                await Context.SaveChangesAsync();
+            await JSRuntime.InvokeVoidAsync("alert", "Localidade excluida!");
+                NavManager.NavigateTo("/localidades");
         }
     }
 

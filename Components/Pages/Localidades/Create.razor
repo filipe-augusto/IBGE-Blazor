@@ -2,10 +2,11 @@
 @using IBGE_Blazor.Models
 @using IBGE_Blazor.Data
 @using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
 @inject ApplicationDbContext Context;
 @inject NavigationManager NavManager
 @inject IJSRuntime JSRuntime
-@rendermode InteractiveServer
+@inject SweetAlertService Swal
 <Mensagem Texto="@_mensagem" TipoMensagem="@_tipoMensagem" Exibir="_exibir"></Mensagem>
 <h3>NOVA LOCALIDADE</h3>
   
@@ -33,21 +34,22 @@
 @* </form> *@
 </EditForm>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
 @code {
-    [SupplyParameterFromForm]
-    private Localidade? Model { get; set; } = new Localidade();
+        [SupplyParameterFromForm]
+        private Localidade? Model { get; set; } = new Localidade();
     private List<Localidade> localidades = new();
     private string? errorMessage = null;
     string _mensagem = "";
     string _tipoMensagem = "";
     string _exibir = "none";
 
-    protected override  void OnInitialized()
-    {
-        //_mensagem = "Teste";
 
-    }
+    private bool pageReloaded = false;
+
+
+
+   
 
 
     private async Task CreateLocal()
@@ -58,8 +60,8 @@
             //AJUSTAR POST
             await Context.Cidades.AddAsync(Model);
             await Context.SaveChangesAsync();
-            // await ChamaMensagem("Localidade criada com sucesso!", "success", 3);
-           // await MostrarMensagem_Sucesso();
+            await JSRuntime.InvokeVoidAsync("alert", "Localidade criada com sucesso!");
+            //await Swal.FireAsync("Sucesso", "Criado com sucesso", "success");
             await Task.Delay(2000);
             NavManager.NavigateTo("/localidades");
         }
@@ -74,9 +76,12 @@
 
     async Task MostrarMensagem_Sucesso()
     {
-        await JSRuntime
-        .InvokeVoidAsync("MensagemCriacao");
-
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("MensagemCriacao");
+        }
+        catch (Exception ex)
+        {}     
     }
     async Task MostrarMensagem_Falha()
     {
