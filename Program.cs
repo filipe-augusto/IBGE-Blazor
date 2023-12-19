@@ -26,7 +26,7 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 var cnnStr = builder.Configuration.GetConnectionString("DefaultConnection");
-var serverVersion = new MySqlServerVersion(new Version(8, 0, 34));
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     
 options.UseSqlServer(cnnStr));

@@ -129,7 +129,7 @@
             
         var local = await Context.Cidades.FirstOrDefaultAsync(x => x.Id == Id);
                 if (local is null)
-                    throw new Exception("Produto não encontrado");
+                    throw new Exception("Item não encontrado");
                 Context.Cidades.Remove(local);
                 await Context.SaveChangesAsync();
             await JSRuntime.InvokeVoidAsync("alert", "Localidade excluida!");
