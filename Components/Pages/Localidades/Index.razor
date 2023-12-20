@@ -2,17 +2,26 @@
 @using IBGE_Blazor.Models;
 @using IBGE_Blazor.Services.Localidades;
 @using IBGE_Blazor.Shared.ViewModels;
-
+@rendermode InteractiveServer
 <h1>Localidades</h1>
 <a href="localidades/create" class="btn btn-primary"><i class="oi oi-plus"></i> Criar </a>
-<form class="d-flex">
+<EditForm Model="@Search" OnValidSubmit="@Pesquisar" FormName="pesquisar-localidade-form">
     <p> Pesquisar por </p>
     <div>
-        <div>
-            <label asp-for="@Search.City">Cidade</label>
-            <input asp-for="@Search.City" type="text"/>
+        <div class="mb-3">
+            <label for="Cidade" class="form-label">Cidade</label>
+            <InputText class="form-control" type="text" id="Id" @bind-Value="Search.Id" disabled />
         </div>
-        <div>
+        <div class="mb-3">
+            <label for="Cidade" class="form-label">Cidade</label>
+            <InputText class="form-control" type="text" id="Cidade" @bind-Value="Search.City" />
+        </div>
+
+        <div class="mb-3">
+            <label for="Estado" class="form-label">Estado</label>
+            <InputText class="form-control" type="text" id="Estado" @bind-Value="Search.State" />
+        </div>
+@*         <div>
             <label asp-for="@Search.State">Estado</label>
             <select asp-for="@Search.State" >
                 <option value="">Selecione...</option>
@@ -20,16 +29,18 @@
                     <option value="@estado">@estado</option>
                 }
             </select>
-        </div>
-        <div>
+        </div> *@
+   @*      <div>
             <label asp-for="@Search.City">Cidade</label>
             <input asp-for="@Search.City" type="text" />
-        </div>
-        <button type="button" onclick="@Pesquisar()">
+        </div> *@
+        <button class="btn btn-danger" type="submit" >
             Pesquisar
         </button>
+
     </div>
-</form>
+        </EditForm>
+     
 @if(Model == null)
 {
     <span>...carregando</span>
@@ -69,7 +80,7 @@
     [Inject]
     private LocalidadeServices _service { get; set; }
     private PaginationModel<EnumLocalidadeOrdenarPor> pagination { get; set; } = new();
-    public Localidade Search { get; set; } = new();
+    public PaginacaoViewModel Search { get; set; } = new();
     protected List<string> Estados { get; set; } = new List<string>();
 
     protected override async Task OnInitializedAsync()
@@ -90,8 +101,9 @@
             Search.State,
             Search.City);
     }
-    protected async Task Pesquisar()
+    private async Task Pesquisar()
     {
+        //var teste = 1;
         pagination.PaginaAtual = 1;
         Model = await _service.ObterLocalidades(
             pagination.PaginaAtual,
