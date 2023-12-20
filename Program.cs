@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using CurrieTechnologies.Razor.SweetAlert2;
 
 using IBGE_Blazor.Components;
 using IBGE_Blazor.Components.Account;
 using IBGE_Blazor.Data;
-using CurrieTechnologies.Razor.SweetAlert2;
+using IBGE_Blazor.Services.Localidades;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,7 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+builder.Services.AddScoped<LocalidadeServices>();
 
 builder.Services.AddAuthentication(options =>
     {

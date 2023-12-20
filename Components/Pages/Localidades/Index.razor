@@ -1,30 +1,104 @@
-﻿sing Microsoft.AspNetCore.Components;
-namespace BlazorBook.Components.Pages;
+﻿@page "/localidades"
+@using IBGE_Blazor.Models;
+@using IBGE_Blazor.Services.Localidades;
+@using IBGE_Blazor.Shared.ViewModels;
 
-public class LocalicadeIndexCode : ComponentBase
+<h1>Localidades</h1>
+<a href="localidades/create" class="btn btn-primary"><i class="oi oi-plus"></i> Criar </a>
+<form class="d-flex">
+    <p> Pesquisar por </p>
+    <div>
+        <div>
+            <label asp-for="@Search.City">Cidade</label>
+            <input asp-for="@Search.City" type="text"/>
+        </div>
+        <div>
+            <label asp-for="@Search.State">Estado</label>
+            <select asp-for="@Search.State" >
+                <option value="">Selecione...</option>
+                @foreach (var estado in Estados){
+                    <option value="@estado">@estado</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label asp-for="@Search.City">Cidade</label>
+            <input asp-for="@Search.City" type="text" />
+        </div>
+        <button type="button" onclick="@Pesquisar()">
+            Pesquisar
+        </button>
+    </div>
+</form>
+@if(Model == null)
+{
+    <span>...carregando</span>
+}
+@if (Model != null)
+{
 
-    private ListaPaginada<Localidade> Model = new();
+    <table class="table">
+        <thead>
+            <tr>
+                <td>Codigo</td>
+                <td>Cidade</td>
+                <td>Estado</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var localidade in Model)
+            {
+                <tr>
+                    <td>@localidade.Id</td>
+                    <td>@localidade.City</td>
+                    <td>@localidade.State</td>
+                    <td>
+
+                        <a href="/localidades/detalhes/@localidade.Id" >Detalhes</a>
+
+                    </td> 
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+@code {
+    protected IPagedList<Localidade> Model = null;
     [Inject]
     private LocalidadeServices _service { get; set; }
-    private PaginationQueryModel pagination { get; set; }
+    private PaginationModel<EnumLocalidadeOrdenarPor> pagination { get; set; } = new();
+    public Localidade Search { get; set; } = new();
+    protected List<string> Estados { get; set; } = new List<string>();
 
     protected override async Task OnInitializedAsync()
     {
-        pagination = new PaginationQueryModel
-            {
-                TamanhoPaginacao = 10,
-                c = 1,
-                t = 10,
-                ob = (int)EnumLocalidadeOrdenarPor.NomeAsc
-            };
+        pagination.OrdenarPor = EnumLocalidadeOrdenarPor.NomeAsc;
 
-        //PAGINAÇÃO ...
-
-        //COMPONENTES
-        Model = await _service.ObterLocalidades(pagination.c,pagination.t,pagination.ob);
+        Estados = await _service.ObterEstados();
+        Model = await _service.ObterLocalidades(pagination.PaginaAtual, pagination.TamanhoPagina, pagination.OrdenarPor);
+        pagination.TotalPaginas = Model.TotalPaginas;
     }
     private async Task TrocarPagina(int novaPagina)
     {
-        
+        Model = await _service.ObterLocalidades(
+            novaPagina,
+            pagination.TamanhoPagina,
+            pagination.OrdenarPor,
+            Search.Id,
+            Search.State,
+            Search.City);
     }
-
+    protected async Task Pesquisar()
+    {
+        pagination.PaginaAtual = 1;
+        Model = await _service.ObterLocalidades(
+            pagination.PaginaAtual,
+            pagination.TamanhoPagina,
+            pagination.OrdenarPor,
+            Search.Id,
+            Search.State,
+            Search.City);
+    }
+}
