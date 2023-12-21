@@ -3,41 +3,46 @@
 @using IBGE_Blazor.Services.Localidades;
 @using IBGE_Blazor.Shared.ViewModels;
 @rendermode InteractiveServer
-<h1>Localidades</h1>
-<a href="localidades/create" class="btn btn-primary"><i class="oi oi-plus"></i> Criar </a>
-<EditForm Model="@Search" OnValidSubmit="@Pesquisar" FormName="pesquisar-localidade-form">
-    <p> Pesquisar por </p>
-    <div>
-        <div class="mb-3">
-            <label for="Cidade" class="form-label">Cidade</label>
-            <InputText class="form-control" type="text" id="Id" @bind-Value="Search.Id" disabled />
+
+<div class="row">
+    <div class="col-10">
+        <h1>Localidades</h1>
+    </div>
+    <div class="col-2">
+        <a href="localidades/create" class="btn btn-primary" title="clique para criar uma localidade">
+            <i class="oi oi-plus"></i> Criar </a>
+
         </div>
-        <div class="mb-3">
+</div>
+
+<EditForm Model="@Search" OnValidSubmit="@Pesquisar" FormName="pesquisar-localidade-form">
+   
+    <div class="row">
+        <div class="col-3">
+            <label for="Cidade" class="form-label">Código</label>
+            <InputText class="form-control" type="text" id="Id" @bind-Value="Search.Id" />
+        </div>
+        <div class="col-3">
             <label for="Cidade" class="form-label">Cidade</label>
             <InputText class="form-control" type="text" id="Cidade" @bind-Value="Search.City" />
-        </div>
+            </div>
 
-        <div class="mb-3">
+            <div class="col-3">
             <label for="Estado" class="form-label">Estado</label>
-            <InputText class="form-control" type="text" id="Estado" @bind-Value="Search.State" />
-        </div>
-@*         <div>
-            <label asp-for="@Search.State">Estado</label>
-            <select asp-for="@Search.State" >
-                <option value="">Selecione...</option>
-                @foreach (var estado in Estados){
+            <InputSelect id="Estado" @bind-Value="Search.State" class="form-control">
+                @foreach (var estado in Estados)
+                {
                     <option value="@estado">@estado</option>
                 }
-            </select>
-        </div> *@
-   @*      <div>
-            <label asp-for="@Search.City">Cidade</label>
-            <input asp-for="@Search.City" type="text" />
-        </div> *@
-        <button class="btn btn-danger" type="submit" >
-            Pesquisar
-        </button>
+                <option value="">Nenhum</option>
+            </InputSelect>
 
+            </div>
+        <div class="col-3 mt-4">
+            <button class="btn btn-danger mt-1" type="submit" title="pesquisar localidade">
+                Pesquisar
+            </button>
+            </div>
     </div>
         </EditForm>
      
@@ -47,9 +52,9 @@
 }
 @if (Model != null)
 {
-
-    <table class="table">
-        <thead>
+    <hr/>
+    <table class="table table-hover mt-4">
+        <thead class="table-primary">
             <tr>
                 <td>Codigo</td>
                 <td>Cidade</td>
@@ -76,11 +81,13 @@
     </table>
 }
 @code {
+    [SupplyParameterFromForm]
+    public LocalidadeViewModel Search { get; set; } = new();
     protected IPagedList<Localidade> Model = null;
     [Inject]
     private LocalidadeServices _service { get; set; }
     private PaginationModel<EnumLocalidadeOrdenarPor> pagination { get; set; } = new();
-    public PaginacaoViewModel Search { get; set; } = new();
+
     protected List<string> Estados { get; set; } = new List<string>();
 
     protected override async Task OnInitializedAsync()
@@ -103,14 +110,15 @@
     }
     private async Task Pesquisar()
     {
-        //var teste = 1;
+ 
         pagination.PaginaAtual = 1;
         Model = await _service.ObterLocalidades(
             pagination.PaginaAtual,
             pagination.TamanhoPagina,
             pagination.OrdenarPor,
-            Search.Id,
-            Search.State,
-            Search.City);
+            string.IsNullOrEmpty(Search.Id) ? null : Search.Id,
+            string.IsNullOrEmpty(Search.State) ? null : Search.State,
+            string.IsNullOrEmpty(Search.City) ? null : Search.City
+        );
     }
 }

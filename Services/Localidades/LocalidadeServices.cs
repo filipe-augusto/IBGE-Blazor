@@ -14,14 +14,16 @@ public class LocalidadeServices
     {
         _context = context;
     }
-    public async Task<IPagedList<Localidade>> ObterLocalidades(int pagina, int tamanhoPagina, EnumLocalidadeOrdenarPor ordenarPor, string codigo = null, string estado = null, string cidade = null)
+    public async Task<IPagedList<Localidade>> ObterLocalidades(int pagina, int tamanhoPagina,
+        EnumLocalidadeOrdenarPor ordenarPor, string codigo = null, string estado = null, string cidade = null)
     {
         if (pagina > 0) pagina -= 1;
         if (tamanhoPagina == 0) tamanhoPagina = 10;
 
         if (codigo != null)
         {
-            var localidade = await _context.Cidades.Where(c => c.Id == codigo).ToListaPaginada(pagina, tamanhoPagina);
+            var localidade = await _context.Cidades.Where(c => c.Id == codigo)
+                .ToListaPaginada(pagina, tamanhoPagina);
             return localidade;
         }
         var query = _context.Cidades.AsQueryable();
